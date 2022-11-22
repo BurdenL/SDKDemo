@@ -73,7 +73,9 @@ public class NoticePushImpl implements NoticePush {
             noticePush.mClients.add(client);
         }
 
-        if (isServiceRunning(activity, "com.tools.myNotice.notice.NotificationService")) ;
+        if (!isServiceRunning(activity, "com.tools.myNotice.notice.NotificationService")) {
+            startService();
+        }
     }
 
     public void removeReceiveMessage(NoticeClient client) {

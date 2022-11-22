@@ -59,10 +59,11 @@ public class NotificationService extends NotificationListenerService {
      * 切换通知监听服务
      */
     private void toggleNotificationListenerService() {
-
+        String brand = Build.BRAND;
         // API>=24,使用
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !("huawei".equalsIgnoreCase(brand) || "honor".equalsIgnoreCase(brand))) {
             requestRebind(new ComponentName(getApplicationContext(), NotificationService.class));
+
         } else {
             // API<24,使用
             PackageManager pm = getPackageManager();
@@ -243,9 +244,20 @@ public class NotificationService extends NotificationListenerService {
      */
     @Override
     public void onListenerDisconnected() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            // 通知侦听器断开连接 - 请求重新绑定
-            requestRebind(new ComponentName(this, NotificationListenerService.class));
+        String brand = Build.BRAND;
+        // API>=24,使用
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !("huawei".equalsIgnoreCase(brand) || "honor".equalsIgnoreCase(brand))) {
+            requestRebind(new ComponentName(getApplicationContext(), NotificationService.class));
+
+        } else {
+            // API<24,使用
+            PackageManager pm = getPackageManager();
+            pm.setComponentEnabledSetting(new ComponentName(this, NotificationService.class),
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP);
+            pm.setComponentEnabledSetting(new ComponentName(this, NotificationService.class),
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP);
         }
     }
 
