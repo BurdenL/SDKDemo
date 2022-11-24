@@ -30,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private static final String TAG = "MainActivity";
     // 通知相关
     private int id = 1111;
     private String channelId = "channelId1";//渠道id
@@ -39,9 +40,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btn_send;
     private TextView textview;
 
-    private BufferedWriter bufferedWriter;
-    @SuppressLint("SimpleDateFormat")
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +49,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_send = findViewById(R.id.btn_send);
         btn_send.setOnClickListener(this::onClick);
 
+
+        Log.e(TAG, "onCreate: " + getPackageName());
         if (NotificationManagerCompat.getEnabledListenerPackages(this).contains(getPackageName())) {
-            NoticePushImpl.init(this);
+            NoticePushImpl.getIns(this);
 
         } else {
             startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
@@ -82,14 +82,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         };
-        NoticePushImpl.getIns().addReceiveMessage(noticeClient);
+        NoticePushImpl.getIns(MainActivity.this).addReceiveMessage(noticeClient);
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        NoticePushImpl.getIns().removeReceiveMessage(noticeClient);
+        NoticePushImpl.getIns(MainActivity.this).removeReceiveMessage(noticeClient);
     }
 
     public void addNotificationChannel() {
@@ -108,32 +108,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
-//    private void writeData(String str) {
-//
-//        try {
-//            File fileDir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "NotificationDemo");
-//            fileDir.mkdir();
-//            String basePath = Environment.getExternalStorageDirectory() + File.separator + "NotificationDemo" + File.separator + "record.txt";
-//            FileOutputStream fos = new FileOutputStream(new File(basePath), true);
-//            OutputStreamWriter osw = new OutputStreamWriter(fos);
-//            bufferedWriter = new BufferedWriter(osw);
-//            bufferedWriter.append(str);
-//            Log.e("KEVIN", "Initialization Successful");
-//
-//        } catch (IOException e) {
-//            Log.e("KEVIN", "BufferedWriter Initialization error");
-//        } finally {
-//            if (bufferedWriter != null) {
-//                try {
-//                    bufferedWriter.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//
-//    }
 
     @Override
     public void onClick(View v) {

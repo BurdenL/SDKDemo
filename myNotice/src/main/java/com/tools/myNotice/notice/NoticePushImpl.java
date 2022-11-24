@@ -6,7 +6,6 @@ import android.app.ActivityManager.RunningServiceInfo;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 
 
 import java.util.ArrayList;
@@ -26,29 +25,24 @@ public class NoticePushImpl implements NoticePush {
     private static NoticePushImpl noticePush;
     private MyNotice postNotice;
 
-    private Activity activity;
+    private Context context;
 
 
-    private NoticePushImpl(Activity activity) {
+    private NoticePushImpl(Context context) {
         mClients = new ArrayList<>();
 
-        if (activity != null)
-            this.activity = activity;
+        if (context != null)
+            this.context = context;
 
-        this.startService();
+        this.startNoticeService();
     }
 
 
-    public static void init(Activity activity) {
+
+    public static NoticePushImpl getIns(Context context) {
         if (noticePush == null) {
-            noticePush = new NoticePushImpl(activity);
+            noticePush = new NoticePushImpl(context);
         }
-
-
-    }
-
-    public static NoticePushImpl getIns() {
-
         return noticePush;
 
     }
@@ -73,8 +67,8 @@ public class NoticePushImpl implements NoticePush {
             noticePush.mClients.add(client);
         }
 
-        if (!isServiceRunning(activity, "com.tools.myNotice.notice.NotificationService")) {
-            startService();
+        if (!isServiceRunning(context, "com.tools.myNotice.notice.NotificationService")) {
+            startNoticeService();
         }
     }
 
@@ -98,10 +92,11 @@ public class NoticePushImpl implements NoticePush {
         }
     }
 
-    public void startService() {
+    public void startNoticeService() {
         try {
-            Intent intent = new Intent(activity, NotificationService.class);
-            activity.startService(intent);
+            Intent intent = new Intent(context, NotificationService.class);
+            context.startService(intent);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -11,20 +11,39 @@ import androidx.annotation.NonNull;
  */
 public class MyNotice {
 
+
+    // 消息类型，1发送，2撤回
+    private int notificationType = 0;
+    private int notificationId = 0;
+    private String notificationKey = "";
     private String notificationPkg = "";
     private String notificationTitle = "";
     private String notificationText = "";
     private long notificationTime = 0;
 
 
-    public MyNotice() {
+    public int getNotificationType() {
+        return notificationType;
     }
 
-    public MyNotice(String notificationPkg, String notificationTitle, String notificationText, long notificationTime) {
-        this.notificationPkg = notificationPkg;
-        this.notificationTitle = notificationTitle;
-        this.notificationText = notificationText;
-        this.notificationTime = notificationTime;
+    public void setNotificationType(int notificationType) {
+        this.notificationType = notificationType;
+    }
+
+    public int getNotificationId() {
+        return notificationId;
+    }
+
+    public void setNotificationId(int notificationId) {
+        this.notificationId = notificationId;
+    }
+
+    public String getNotificationKey() {
+        return notificationKey;
+    }
+
+    public void setNotificationKey(String notificationKey) {
+        this.notificationKey = notificationKey;
     }
 
     public String getNotificationPkg() {
@@ -62,7 +81,10 @@ public class MyNotice {
     @Override
     public String toString() {
         return "MyNotice{" +
-                "notificationPkg='" + notificationPkg + '\'' +
+                "notificationType=" + notificationType +
+                ", notificationId=" + notificationId +
+                ", notificationKey='" + notificationKey + '\'' +
+                ", notificationPkg='" + notificationPkg + '\'' +
                 ", notificationTitle='" + notificationTitle + '\'' +
                 ", notificationText='" + notificationText + '\'' +
                 ", notificationTime=" + notificationTime +

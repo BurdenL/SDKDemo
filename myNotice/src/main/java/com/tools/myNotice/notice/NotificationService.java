@@ -50,46 +50,78 @@ public class NotificationService extends NotificationListenerService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e(TAG, "onCreate: ");
         toggleNotificationListenerService();
     }
 
 
-    /**
-     * 切换通知监听服务
-     */
-    private void toggleNotificationListenerService() {
-        String brand = Build.BRAND;
-        // API>=24,使用
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !("huawei".equalsIgnoreCase(brand) || "honor".equalsIgnoreCase(brand))) {
-            requestRebind(new ComponentName(getApplicationContext(), NotificationService.class));
-
-        } else {
-            // API<24,使用
-            PackageManager pm = getPackageManager();
-            pm.setComponentEnabledSetting(new ComponentName(this, NotificationService.class),
-                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                    PackageManager.DONT_KILL_APP);
-            pm.setComponentEnabledSetting(new ComponentName(this, NotificationService.class),
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    PackageManager.DONT_KILL_APP);
-        }
-
-
-    }
-
     @Override
     public void onNotificationPosted(StatusBarNotification sbn, RankingMap rankingMap) {
         super.onNotificationPosted(sbn, rankingMap);
-        Log.e(TAG, "onNotificationPosted: 1111");
     }
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
-        Log.e(TAG, "onNotificationPosted: burden");
+        postNotification(sbn, 1);
+
+
+//        MyNotice myNotice = new MyNotice();
+//        myNotice.setNotificationPkg(sbn.getPackageName());
+//        myNotice.setNotificationTime(sbn.getPostTime());
+//
+//
+//        try {
+//            Notification notification = sbn.getNotification();
+//            if (notification != null) {
+//                Bundle extras = notification.extras;
+//                if (extras != null) {
+//                    myNotice.setNotificationTitle(extras.getString(Notification.EXTRA_TITLE, ""));
+////                    myNotice.setNotificationText(extras.getString(Notification.EXTRA_TEXT, ""));
+//
+//                    String content = extras.getString(Notification.EXTRA_TEXT, "");
+//                    Object msgText = extras.getCharSequence(Notification.EXTRA_TEXT, "");
+//
+//                    if (content.isEmpty() && msgText instanceof SpannableString) {
+//                        content = msgText.toString();
+//                    }
+//
+//
+//                    myNotice.setNotificationText(content);
+//                    // 注意：获取的通知信息和短信的传递内容不一样 短信为SpannableString 这里容易造成转换异常
+////                    if (msgText instanceof SpannableString) {
+////                        Log.d(TAG, "is SpannableString ...." + ((SpannableString) msgText).subSequence(0, ((SpannableString) msgText).length()));
+////                        myNotice.setNotificationText(extras.getString(msgText.toString()));
+////
+////                    } else if (msgText instanceof String) {
+////                        Log.d(TAG, "showMsg msgText=" + msgText);
+////                        myNotice.setNotificationText(extras.getString(msgText.toString()));
+////
+////                    }
+//
+//                }
+//            }
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            NoticePushImpl.getIns().seedPostNotice(myNotice);
+//
+//        }
+    }
+
+
+    @Override
+    public void onNotificationRemoved(StatusBarNotification sbn) {
+        postNotification(sbn, 2);
+
+    }
+
+    private void postNotification(StatusBarNotification sbn, int type) {
         MyNotice myNotice = new MyNotice();
+        myNotice.setNotificationId(sbn.getId());
+        myNotice.setNotificationKey(sbn.getKey());
         myNotice.setNotificationPkg(sbn.getPackageName());
         myNotice.setNotificationTime(sbn.getPostTime());
+        myNotice.setNotificationType(type);
 
 
         try {
@@ -126,15 +158,9 @@ public class NotificationService extends NotificationListenerService {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            NoticePushImpl.getIns().seedPostNotice(myNotice);
+            NoticePushImpl.getIns(NotificationService.this).seedPostNotice(myNotice);
 
         }
-    }
-
-
-    @Override
-    public void onNotificationRemoved(StatusBarNotification sbn) {
-        super.onNotificationRemoved(sbn);
     }
 
 
@@ -244,6 +270,13 @@ public class NotificationService extends NotificationListenerService {
      */
     @Override
     public void onListenerDisconnected() {
+        toggleNotificationListenerService();
+    }
+
+    /**
+     * 切换通知监听服务
+     */
+    private void toggleNotificationListenerService() {
         String brand = Build.BRAND;
         // API>=24,使用
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !("huawei".equalsIgnoreCase(brand) || "honor".equalsIgnoreCase(brand))) {
@@ -259,7 +292,8 @@ public class NotificationService extends NotificationListenerService {
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                     PackageManager.DONT_KILL_APP);
         }
-    }
 
+
+    }
 
 }
